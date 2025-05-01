@@ -38,6 +38,17 @@
                ReferencedContainer = "container:exponordicdfuexample.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "411B6D472DC3E32900EF696B"
+               BuildableName = "ExpoNordicDfuModuleTests.xctest"
+               BlueprintName = "ExpoNordicDfuModuleTests"
+               ReferencedContainer = "container:exponordicdfuexample.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

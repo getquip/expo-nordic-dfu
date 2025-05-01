@@ -64,3 +64,10 @@ target 'exponordicdfuexample' do
     end
   end
 end
+
+target 'ExpoNordicDfuModuleTests' do
+  inherit! :complete
+
+  # Needed so the tests can access your module
+  pod 'ExpoNordicDfu', :path => '../../ios'
+end
