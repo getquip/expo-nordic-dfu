@@ -49,8 +49,10 @@ public class ExpoNordicDfuModule: Module, DFUProgressDelegate, DFUServiceDelegat
 
             Self.logger.info("Starting DFU on device \(uuid)")
 
-            let path = fileUri.replacingOccurrences(of: "file://", with: "")
-            let url = URL(fileURLWithPath: path)
+            let filePath = fileUri.replacingOccurrences(of: "file://", with: "")
+            // If the file path contains percent encoding, URL will fail to parse it correctly.
+            let decodedPath = filePath.removingPercentEncoding ?? filePath
+            let url = URL(fileURLWithPath: decodedPath)
             let firmware = try DFUFirmware(urlToZipFile: url)
             let initiator = DFUServiceInitiator().with(firmware: firmware)
             initiator.logger = self
