@@ -5,16 +5,16 @@
   },
   "description": "Nordic DFU for Expo",
   "devDependencies": {
-    "@types/react": "~18.3.12",
-    "eslint-config-expo": "~8.0.1",
+    "@types/react": "~19.1.10",
+    "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-jest": "^28.11.0",
-    "eslint-plugin-prettier": "^5.2.3",
-    "expo": "~52.0.46",
-    "expo-doctor": "^1.12.5",
-    "expo-module-scripts": "^4.0.5",
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "expo": "~54.0.12",
+    "expo-doctor": "^1.17.9",
+    "expo-module-scripts": "^5.0.7",
     "prettier": "^3.4.2",
-    "react-native": "^0.76.9"
+    "react-native": "^0.81.4"
   },
   "expo-module": {
     "platforms": [
@@ -36,9 +36,9 @@
   "main": "build/index.js",
   "name": "@getquip/expo-nordic-dfu",
   "peerDependencies": {
-    "expo": "^52.0.0",
-    "react": "^18.0.0",
-    "react-native": "^0.76.0"
+    "expo": "^54.0.0",
+    "react": "^19.1.0",
+    "react-native": "^0.81.4"
   },
   "publishConfig": {
     "access": "public"
@@ -68,5 +68,5 @@
   },
   "types": "build/index.d.ts",
   "url": "https://github.com/getquip/expo-nordic-dfu",
-  "version": "1.0.0"
+  "version": "2.0.0"
 }

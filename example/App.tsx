@@ -1,10 +1,11 @@
 import ExpoNordicDfu from 'expo-nordic-dfu';
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Alert, KeyboardAvoidingView, PermissionsAndroid, Platform,  ScrollView, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context'
 import BleManager, { Peripheral } from 'react-native-ble-manager'
 import { Text, Button } from 'react-native-paper'
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 
 const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',').map((uuid: string) => uuid.trim())
 const ANDROID_BONDING_ENABLED = process.env.EXPO_PUBLIC_ANDROID_BONDING_ENABLED === 'true'
@@ -201,7 +202,8 @@ export default function App() {
           return;
         }
 
-        const fileInfo = await FileSystem.getInfoAsync(file.uri);
+        const fileInfo = new File(file.uri).info()
+        
         if (!fileInfo.exists) {
           throw new Error('File does not exist');
         }
