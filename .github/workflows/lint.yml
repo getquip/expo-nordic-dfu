@@ -15,15 +15,12 @@ jobs:
     name: Actionlint
     runs-on: ubuntu-latest
     steps:
-      -
-        uses: actions/checkout@v4
-      -
-        name: Download actionlint
+      - uses: actions/checkout@v4
+      - name: Download actionlint
         id: get_actionlint
         shell: bash
         run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-      -
-        name: Check Workflow Files
+      - name: Check Workflow Files
         shell: bash
         run: ${{ steps.get_actionlint.outputs.executable }} -color -verbose
 
@@ -31,19 +28,15 @@ jobs:
     name: Prettier
     runs-on: ubuntu-latest
     steps:
-      -
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.sha }}
-      -
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      -
-        run: npm install
-      -
-        name: Check Prettier
+      - run: npm install
+      - name: Check Prettier
         run: npm run prettier:check
 
   eslint:
@@ -52,17 +45,13 @@ jobs:
     env:
       ESLINT_PLUGIN_DIFF_COMMIT: ${{ inputs.diff_ref }}
     steps:
-      -
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.sha }}
-      -
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      -
-        run: npm install
-      -
-        name: Check ESLint
+      - run: npm install
+      - name: Check ESLint
         run: npm run eslint:check

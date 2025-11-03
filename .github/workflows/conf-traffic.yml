@@ -1,106 +1,102 @@
 name: Weekly GitHub Activity Report
 on:
   schedule:
-    - cron: '0 9 * * 1' # Every Monday at 9:00 UTC
+    - cron: "0 9 * * 1" # Every Monday at 9:00 UTC
   workflow_dispatch:
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-    -
-      uses: actions/checkout@v4
-    -
-      uses: actions/create-github-app-token@v2
-      id: app-token
-      with:
-        app-id: ${{ secrets.REPO_ADMIN_READ_APP_ID }}
-        private-key: ${{ secrets.REPO_ADMIN_READ_APP_PRIVATE_KEY }}
-    -
-      name: Fetch stats
-      id: stats
-      env:
-        GH_TOKEN: ${{ steps.app-token.outputs.token }}
-      run: |
-        GH_API="/repos/${{ github.repository }}"
-        TRAFFIC_API="/repos/${{ github.repository }}/traffic/views"
-        ACCEPT_HEADER="Accept: application/vnd.github+json"
-        API_VERSION_HEADER="X-GitHub-Api-Version: 2022-11-28"
+      - uses: actions/checkout@v4
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.REPO_ADMIN_READ_APP_ID }}
+          private-key: ${{ secrets.REPO_ADMIN_READ_APP_PRIVATE_KEY }}
+      - name: Fetch stats
+        id: stats
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          GH_API="/repos/${{ github.repository }}"
+          TRAFFIC_API="/repos/${{ github.repository }}/traffic/views"
+          ACCEPT_HEADER="Accept: application/vnd.github+json"
+          API_VERSION_HEADER="X-GitHub-Api-Version: 2022-11-28"
 
-        repo_json=$(gh api -H "$ACCEPT_HEADER" -H "$API_VERSION_HEADER" "$GH_API")
-        forks=$(echo "$repo_json" | jq .forks_count)
-        watchers=$(echo "$repo_json" | jq .watchers)
-        stars=$(echo "$repo_json" | jq .stargazers_count)
-        visitors_json=$(gh api -H "$ACCEPT_HEADER" -H "$API_VERSION_HEADER" "$TRAFFIC_API")
-        visitors=$(echo "$visitors_json" | jq .count)
+          repo_json=$(gh api -H "$ACCEPT_HEADER" -H "$API_VERSION_HEADER" "$GH_API")
+          forks=$(echo "$repo_json" | jq .forks_count)
+          watchers=$(echo "$repo_json" | jq .watchers)
+          stars=$(echo "$repo_json" | jq .stargazers_count)
+          visitors_json=$(gh api -H "$ACCEPT_HEADER" -H "$API_VERSION_HEADER" "$TRAFFIC_API")
+          visitors=$(echo "$visitors_json" | jq .count)
 
-        {
-          echo "FORKS=${forks}"
-          echo "WATCHERS=${watchers}"
-          echo "STARS=${stars}"
-          echo "VISITORS=${visitors}"
-        } >> "$GITHUB_ENV"
-    -
-      name: Send Slack notification
-      run: |
-        run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        payload=$(jq -n \
-          --arg repo "${{ github.repository }}" \
-          --arg repo_url "${{ github.server_url }}/${{ github.repository }}" \
-          --arg forks "$FORKS" \
-          --arg stars "$STARS" \
-          --arg watchers "$WATCHERS" \
-          --arg visitors "$VISITORS" \
-          --arg run_url "$run_url" \
-          '{
-            blocks: [
-              {
-                type: "header",
-                text: {
-                  type: "plain_text",
-                  text: ":bar_chart: Weekly Open Source Activity Report",
-                  "emoji": true
-                }
-              },
-              {
-                type: "section",
-                text: {
-                  type: "mrkdwn",
-                  text: "*Repository: <\($repo_url)|\($repo)>*"
-                }
-              },
-              {
-                type: "section",
-                fields: [
-                  {
-                    type: "mrkdwn",
-                    text: ":fork: *Forks*: \($forks)"
-                  },
-                  {
-                    type: "mrkdwn",
-                    text: ":star: *Stars*: \($stars)"
-                  },
-                  {
-                    type: "mrkdwn",
-                    text: ":eye: *Watchers*: \($watchers)"
-                  },
-                  {
-                    type: "mrkdwn",
-                    text: ":wave: *Visitors (14d)*: \($visitors)"
+          {
+            echo "FORKS=${forks}"
+            echo "WATCHERS=${watchers}"
+            echo "STARS=${stars}"
+            echo "VISITORS=${visitors}"
+          } >> "$GITHUB_ENV"
+      - name: Send Slack notification
+        run: |
+          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          payload=$(jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg repo_url "${{ github.server_url }}/${{ github.repository }}" \
+            --arg forks "$FORKS" \
+            --arg stars "$STARS" \
+            --arg watchers "$WATCHERS" \
+            --arg visitors "$VISITORS" \
+            --arg run_url "$run_url" \
+            '{
+              blocks: [
+                {
+                  type: "header",
+                  text: {
+                    type: "plain_text",
+                    text: ":bar_chart: Weekly Open Source Activity Report",
+                    "emoji": true
                   }
-                ]
-              },
-              {
-                type: "context",
-                "elements": [
-                  {
+                },
+                {
+                  type: "section",
+                  text: {
                     type: "mrkdwn",
-                    text: "<\($run_url)|Generated By>"
+                    text: "*Repository: <\($repo_url)|\($repo)>*"
                   }
-                ]
-              }
-            ]
-          }')
+                },
+                {
+                  type: "section",
+                  fields: [
+                    {
+                      type: "mrkdwn",
+                      text: ":fork: *Forks*: \($forks)"
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: ":star: *Stars*: \($stars)"
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: ":eye: *Watchers*: \($watchers)"
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: ":wave: *Visitors (14d)*: \($visitors)"
+                    }
+                  ]
+                },
+                {
+                  type: "context",
+                  "elements": [
+                    {
+                      type: "mrkdwn",
+                      text: "<\($run_url)|Generated By>"
+                    }
+                  ]
+                }
+              ]
+            }')
 
-        curl -X POST -H 'Content-type: application/json' \
-          --data "$payload" \
-          ${{ secrets.SLACK_ALERTS_ENG_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' \
+            --data "$payload" \
+            ${{ secrets.SLACK_ALERTS_ENG_WEBHOOK_URL }}

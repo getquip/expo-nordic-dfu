@@ -12,19 +12,15 @@ jobs:
     name: Typescript Compile
     runs-on: ubuntu-latest
     steps:
-      -
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.sha }}
-      -
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      -
-        run: npm install
-      -
-        name: Type Check (Compile) TypeScript
+      - run: npm install
+      - name: Type Check (Compile) TypeScript
         run: |
           set -e
           npx tsc
