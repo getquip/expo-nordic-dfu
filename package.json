@@ -16,6 +16,10 @@
     "prettier": "^3.4.2",
     "react-native": "^0.81.4"
   },
+  "engines": {
+    "node": ">=20.19.4",
+    "npm": ">=10.8"
+  },
   "expo-module": {
     "platforms": [
       "ios",

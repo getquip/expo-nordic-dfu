@@ -23,6 +23,10 @@
     "@types/react": "~19.1.10",
     "typescript": "^5.3.3"
   },
+  "engines": {
+    "node": ">=20.19.4",
+    "npm": ">=10.8"
+  },
   "private": true,
   "expo": {
     "autolinking": {
