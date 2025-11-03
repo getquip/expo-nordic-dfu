@@ -13,18 +13,18 @@ export default defineConfig([
   expoConfig,
   prettierRecommended,
   {
-    ignores: ['eslint.config.mjs', "example/**/*", "build/**/*"],
+    ignores: ["eslint.config.mjs", ".eslintrc.js", "example/**/*", "build/**/*"],
   },
   {
     plugins: {
-      '@typescript-eslint': tsPlugin,
+      "@typescript-eslint": tsPlugin,
       jest: jestPlugin,
       // DO NOT re-declare { import: ..., prettier: ... } here —
       // expoConfig already provides them and re-defining will error.
     },
     languageOptions: {
       parser: tsParser,
-      parserOptions: { project: './tsconfig.json' },
+      parserOptions: { project: "./tsconfig.json" },
     },
     rules: {
       "jest/no-focused-tests": isCI ? "error" : "off",
