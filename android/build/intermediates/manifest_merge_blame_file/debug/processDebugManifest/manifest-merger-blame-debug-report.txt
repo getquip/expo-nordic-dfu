@@ -5,15 +5,15 @@
 5    <uses-sdk android:minSdkVersion="24" />
 6
 7    <application>
-7-->/Users/adamsligar/Source/Quip/react-native-nordic-dfu/android/src/main/AndroidManifest.xml:4:5-9:19
+7-->/Users/adamsligar/Source/Quip/expo-nordic-dfu/android/src/main/AndroidManifest.xml:4:5-9:19
 8        <service
-8-->/Users/adamsligar/Source/Quip/react-native-nordic-dfu/android/src/main/AndroidManifest.xml:5:9-8:63
+8-->/Users/adamsligar/Source/Quip/expo-nordic-dfu/android/src/main/AndroidManifest.xml:5:9-8:63
 9            android:name="com.getquip.nordic.DfuService"
-9-->/Users/adamsligar/Source/Quip/react-native-nordic-dfu/android/src/main/AndroidManifest.xml:6:13-39
+9-->/Users/adamsligar/Source/Quip/expo-nordic-dfu/android/src/main/AndroidManifest.xml:6:13-39
 10            android:exported="false"
-10-->/Users/adamsligar/Source/Quip/react-native-nordic-dfu/android/src/main/AndroidManifest.xml:7:13-37
+10-->/Users/adamsligar/Source/Quip/expo-nordic-dfu/android/src/main/AndroidManifest.xml:7:13-37
 11            android:foregroundServiceType="connectedDevice" />
-11-->/Users/adamsligar/Source/Quip/react-native-nordic-dfu/android/src/main/AndroidManifest.xml:8:13-60
+11-->/Users/adamsligar/Source/Quip/expo-nordic-dfu/android/src/main/AndroidManifest.xml:8:13-60
 12    </application>
 13
 14</manifest>

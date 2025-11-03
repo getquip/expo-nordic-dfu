@@ -5,16 +5,20 @@
   },
   "description": "Nordic DFU for Expo",
   "devDependencies": {
-    "@types/react": "~18.3.12",
-    "eslint-config-expo": "~8.0.1",
+    "@types/react": "~19.1.10",
+    "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-jest": "^28.11.0",
-    "eslint-plugin-prettier": "^5.2.3",
-    "expo": "~52.0.46",
-    "expo-doctor": "^1.12.5",
-    "expo-module-scripts": "^4.0.5",
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "expo": "54.0.21",
+    "expo-doctor": "^1.17.9",
+    "expo-module-scripts": "^5.0.7",
     "prettier": "^3.4.2",
-    "react-native": "^0.76.9"
+    "react-native": "0.81.5"
+  },
+  "engines": {
+    "node": ">=20.19.4",
+    "npm": ">=10.8"
   },
   "expo-module": {
     "platforms": [
@@ -36,9 +40,9 @@
   "main": "build/index.js",
   "name": "@getquip/expo-nordic-dfu",
   "peerDependencies": {
-    "expo": "^52.0.0",
-    "react": "^18.0.0",
-    "react-native": "^0.76.0"
+    "expo": "^54.0.0",
+    "react": "^19.1.0",
+    "react-native": "^0.81.4"
   },
   "publishConfig": {
     "access": "public"
@@ -56,8 +60,8 @@
     "build": "expo-module build",
     "clean": "expo-module clean",
     "expo-module": "expo-module",
-    "eslint:check": "eslint . --max-warnings 0",
-    "eslint:fix": "eslint . --fix",
+    "eslint:check": "eslint . --config eslint.config.mjs --max-warnings 0",
+    "eslint:fix": "eslint . --config eslint.config.mjs --fix",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
     "prettier:check": "prettier --config .prettierrc --check '**/*.{ts,tsx,js,jsx}'",
@@ -68,5 +72,5 @@
   },
   "types": "build/index.d.ts",
   "url": "https://github.com/getquip/expo-nordic-dfu",
-  "version": "1.0.0"
+  "version": "2.0.0"
 }

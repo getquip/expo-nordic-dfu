@@ -3,3 +3,4 @@ android/**/*
 build/**/*
 example/**/*
 ios/**/*
+.eslintrc.js

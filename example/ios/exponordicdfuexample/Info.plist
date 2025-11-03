@@ -46,6 +46,8 @@
     </dict>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>to connect to to Bluetooth devices</string>
+    <key>RCTNewArchEnabled</key>
+    <true/>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
