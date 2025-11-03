@@ -235,7 +235,7 @@ export default function App() {
         fileUri: firmwareFile.uri,
         // These optional values are set to useful values for quip.
         // Change them to your needs.
-        packetReceiptNotificationParameter: 2,
+        packetReceiptNotificationParameter: 1,
         android: {
           deviceName: peripheral.name,
         },
