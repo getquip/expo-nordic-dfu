@@ -1,1 +1,1 @@
-See [parent README](README.md#example-app)
+See [parent README](../README.md#example-app)
