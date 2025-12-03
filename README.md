@@ -14,23 +14,32 @@ This project does not provide an interface for scanning/connecting devices via B
 - Android 14+
 - iOS 17+
 - Expo SDK 54
-- React Native Bridgeless (new architecture) enabled
+- React Native Bridgeless (new architecture) enabled (this is enabled by default in Expo 54+)
 
-## Usage
+## Setup
 
-Please checkout the [example app](example)!
+### Install
+
+```bash
+// NPM projects
+npm install @getquip/expo-nordic-dfu --save
+// Yarn projects
+yarn add @getquip/expo-nordic-dfu
+```
 
 ### Bluetooth permissions
 
-You need the various Bluetooth permission enabled on Expo project. If you use a Bluetooth management library like [react-native-ble-manager](https://github.com/innoveit/react-native-ble-manager), this might be done for you. For android, you also need Foreground services enabled for the DFU process.
+You need the various Bluetooth permissions enabled on your Expo project. If you use a Bluetooth management library like [react-native-ble-manager](https://github.com/innoveit/react-native-ble-manager), this might be done for you. For android, you also need Foreground Services enabled for the DFU process.
 
 ```typescript
 // Expo app.json
 
 // Android
 expo.android.permissions: [
+  // Specifically for DFU
   "android.permission.FOREGROUND_SERVICE",
   "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
+  // Needed for Bluetooth operations
   "android.permission.BLUETOOTH",
   "android.permission.BLUETOOTH_SCAN", // You might need to set "neverForLocation"
   "android.permission.BLUETOOTH_ADMIN",
@@ -39,10 +48,15 @@ expo.android.permissions: [
 
 // iOS
 expo.ios.infoPlist: [
+  // Needed for Bluetooth operations
   "NSBluetoothAlwaysUsageDescription": "Uses Bluetooth to connect to Bluetooth enabled device.",
   "NSBluetoothPeripheralUsageDescription": "Uses Bluetooth to connect to Bluetooth enabled device.",
 ]
 ```
+
+## Usage
+
+Please see the [example app](example)!
 
 ### Listeners
 
@@ -52,6 +66,7 @@ The listeners work mostly the same as the original @ [Pilloxa/react-native-nordi
 - `DFUStateChanged`: Reports back when major DFU flow miletones happen. It will also tell you if the DFU finished, failed or was aborted
 
 ```typescript
+// See the type file src/ExpoNordicDfu.types.ts for schema
 ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
   console.info('DFUProgress:', progress)
 })
@@ -69,6 +84,7 @@ await ExpoNordicDfu.startDfu({
   deviceAddress,
   fileUri,
   // There are many optional parameters and some are OS-specific
+  // The values we support are listed in src/ExpoNordicDfu.types.ts
   // ...,
   // android: {
   //   ...
