@@ -9,9 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.25",
-    "expo-document-picker": "^14.0.7",
-    "expo-file-system": "~19.0.19",
+    "expo": "~54.0.27",
+    "expo-document-picker": "~14.0.8",
+    "expo-file-system": "~19.0.20",
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-ble-manager": "^12.1.4",
