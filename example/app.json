@@ -5,6 +5,8 @@
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/adaptive-icon.png"
       },
+      "edgeToEdgeEnabled": true,
+      "package": "expo.modules.nordicdfu.example",
       "permissions": [
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
@@ -12,13 +14,12 @@
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BLUETOOTH_CONNECT"
       ],
-      "package": "expo.modules.nordicdfu.example"
+      "predictiveBackGestureEnabled": false
     },
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "expo.modules.nordicdfu.example",
-      "supportsTablet": true,
-      "appleTeamId": "UVG7KPQ5XS"
+      "supportsTablet": true
     },
     "name": "expo-nordic-dfu-example",
     "newArchEnabled": true,

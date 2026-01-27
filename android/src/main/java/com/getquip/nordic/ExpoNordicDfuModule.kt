@@ -139,7 +139,7 @@ class ExpoNordicDfuModule : Module() {
                     "speed" to speed,
                     "avgSpeed" to avgSpeed,
                     "currentPart" to currentPart,
-                    "partsTotal" to partsTotal
+                    "totalParts" to partsTotal
                 )
             )
         }

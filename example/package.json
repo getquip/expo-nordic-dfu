@@ -9,10 +9,10 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.27",
+    "expo": "~54.0.32",
     "expo-document-picker": "~14.0.8",
-    "expo-file-system": "~19.0.20",
-    "react": "19.1.2",
+    "expo-file-system": "~19.0.21",
+    "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-ble-manager": "^12.1.4",
     "react-native-paper": "^5.13.3",
@@ -22,24 +22,19 @@
     "@babel/core": "^7.28.5",
     "@types/react": "~19.1.17",
     "expo-doctor": "^1.17.12",
-    "typescript": "^5.3.3"
+    "typescript": "~5.9.2"
   },
   "engines": {
-    "node": ">=20.19.4",
+    "node": ">=20.19",
     "npm": ">=10.8"
   },
   "expo": {
     "autolinking": {
       "nativeModulesDir": ".."
-    },
-    "install": {
-      "exclude": [
-        "react"
-      ]
     }
   },
   "overrides": {
-    "expo-font": "14.0.10"
+    "expo-font": "14.0.11"
   },
   "private": true
 }

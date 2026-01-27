@@ -5,19 +5,18 @@
   },
   "description": "Nordic DFU for Expo",
   "devDependencies": {
-    "@types/react": "~19.1.17",
+    "@types/react": "~19.1.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-jest": "^29.2.1",
     "eslint-plugin-prettier": "^5.5.4",
-    "expo": "~54.0.27",
-    "expo-doctor": "^1.17.12",
+    "expo": "~54.0.32",
     "expo-module-scripts": "^5.0.8",
     "prettier": "^3.7.4",
     "react-native": "0.81.5"
   },
   "engines": {
-    "node": ">=20.19.4",
+    "node": ">=20.19",
     "npm": ">=10.8"
   },
   "expo-module": {
@@ -40,9 +39,9 @@
   "main": "build/index.js",
   "name": "@getquip/expo-nordic-dfu",
   "peerDependencies": {
-    "expo": "^54.0.27",
-    "react": "^19.1.0",
-    "react-native": "^0.81.5"
+    "expo": "^54",
+    "react": "*",
+    "react-native": "*"
   },
   "publishConfig": {
     "access": "public"
@@ -55,7 +54,10 @@
       "type": "modules"
     }
   },
-  "repository": "getquip/expo-nordic-dfu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getquip/expo-nordic-dfu.git"
+  },
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
@@ -72,5 +74,5 @@
   },
   "types": "build/index.d.ts",
   "url": "https://github.com/getquip/expo-nordic-dfu",
-  "version": "2.0.3"
+  "version": "3.0.0"
 }

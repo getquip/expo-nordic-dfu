@@ -1,4 +1,4 @@
-import ExpoNordicDfu from 'expo-nordic-dfu';
+import ExpoNordicDfu, { DFUProgressPayload } from 'expo-nordic-dfu';
 import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, PermissionsAndroid, Platform,  ScrollView, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -49,11 +49,7 @@ type FirmwareFileType = {
 
 type ProgressType = {
   state?: string
-  avgSpeed?: number
-  currentPart?: number,
-  partsTotal?: number,
-  percent?: number,
-  speed?: number,
+  progress: DFUProgressPayload | undefined
 }
 
 export default function App() {
@@ -224,11 +220,11 @@ export default function App() {
     try {
       ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
         console.info('DFUProgress:', progress)
-        setFirmwareProgress({ ...progress, state: 'Updating...' })
+        setFirmwareProgress({ progress, state: 'Updating...' })
       })
       ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
         console.info('DFUStateChanged:', state)
-        setFirmwareProgress({ state, ...firmwareProgress })
+        setFirmwareProgress({ state, progress: firmwareProgress?.progress })
       })
       await ExpoNordicDfu.startDfu({
         deviceAddress: peripheral.id,
@@ -251,7 +247,7 @@ export default function App() {
   const abortDFU = async () => {
     try {
       await ExpoNordicDfu.abortDfu()
-      setFirmwareProgress({ state: 'DFU_ABORTED' })
+      setFirmwareProgress({ state: 'DFU_ABORTED', progress: firmwareProgress?.progress })
     } catch (error) {
       console.error(error)
     } finally {
@@ -299,11 +295,11 @@ export default function App() {
             {firmwareProgress && (
               <View>
                 <Text>DFU State: {firmwareProgress.state}</Text>
-                <Text>DFU Percent Done: {firmwareProgress.percent}</Text>
-                <Text>DFU Current Part: {firmwareProgress.currentPart}</Text>
-                <Text>DFU Total Parts: {firmwareProgress.partsTotal}</Text>
-                <Text>DFU Current Speed: {firmwareProgress.speed}</Text>
-                <Text>DFU Average Speed: {firmwareProgress.avgSpeed}</Text>
+                <Text>DFU Percent Done: {firmwareProgress.progress?.percent}</Text>
+                <Text>DFU Current Part: {firmwareProgress.progress?.currentPart}</Text>
+                <Text>DFU Total Parts: {firmwareProgress.progress?.totalParts}</Text>
+                <Text>DFU Current Speed: {firmwareProgress.progress?.speed}</Text>
+                <Text>DFU Average Speed: {firmwareProgress.progress?.avgSpeed}</Text>
               </View>)}
             {peripheral && selectedColor === SELECTION_COLORS.connected && firmwareFile && !firmwareDisableButtons && (
               <Button
