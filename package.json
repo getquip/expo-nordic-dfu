@@ -72,6 +72,7 @@
     "prepublishOnly": "expo-module prepublishOnly",
     "test": "expo-module test",
     "test:android": "android/standalone/gradlew -p android/standalone :native-tests:test --rerun-tasks",
+    "test:android:ci": "android/standalone/gradlew -p android/standalone :native-tests:test",
     "test:ios": "swift test --package-path ios/Shared --enable-swift-testing",
     "test:native": "npm run test:android && npm run test:ios"
   },

@@ -8,7 +8,7 @@ let package = Package(
     ],
     products: [],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-testing", from: "0.10.0")
+        .package(url: "https://github.com/swiftlang/swift-testing", exact: "0.99.0")
     ],
     targets: [
         .target(

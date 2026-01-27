@@ -49,7 +49,7 @@ jobs:
           java-version: 17
           cache: gradle
       - run: npm install
-      - run: npm run test:android
+      - run: npm run test:android:ci
 
   native-ios:
     name: Native Tests (iOS)

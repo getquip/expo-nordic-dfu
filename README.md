@@ -129,7 +129,7 @@ npm run test:android
 
 ### iOS
 
-Uses a small SwiftPM test target that compiles only the native helper file in `ios/Shared`.
+Uses a small SwiftPM test target that compiles only the native helper file in `ios/Shared`. These tests use Swift Testing and require macOS 10.15+.
 
 ```bash
 npm run test:ios
@@ -137,7 +137,9 @@ npm run test:ios
 
 ### CI
 
-GitHub Actions runs the native unit tests on pull requests using `npm run test:android` (Linux) and `npm run test:ios` (macOS).
+GitHub Actions runs the native unit tests on pull requests using `npm run test:android:ci` (Linux) and `npm run test:ios` (macOS).
+
+Note: SwiftPM may still print a short "0 tests" summary from the legacy runner before the Swift Testing output; the real test results follow immediately after.
 
 ## Contributing
 
