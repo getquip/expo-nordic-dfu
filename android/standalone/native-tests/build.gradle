@@ -1,0 +1,40 @@
+plugins {
+  id 'org.jetbrains.kotlin.jvm' version '2.0.21'
+  id 'com.adarshr.test-logger' version '4.0.0'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testImplementation 'junit:junit:4.13.2'
+}
+
+kotlin {
+  jvmToolchain(17)
+}
+
+sourceSets {
+  main {
+    kotlin {
+      srcDir("../../src/main/java")
+      include("com/getquip/nordic/DfuEventPayloads.kt")
+      include("com/getquip/nordic/AndroidDfuCoordinator.kt")
+    }
+  }
+  test {
+    kotlin {
+      srcDir("src/test/kotlin")
+    }
+  }
+}
+
+testlogger {
+  theme 'standard'
+  showSimpleNames true
+  showPassed true
+  showFailed true
+  showSkipped true
+  showSummary true
+}

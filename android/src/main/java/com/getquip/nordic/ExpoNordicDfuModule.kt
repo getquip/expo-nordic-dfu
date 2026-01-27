@@ -15,8 +15,7 @@ import androidx.core.net.toUri
 import no.nordicsemi.android.dfu.DfuServiceInitiator.createDfuNotificationChannel
 
 class ExpoNordicDfuModule : Module() {
-    private var controller: DfuServiceController? = null
-    private var currentPromise: Promise? = null
+    private val coordinator = AndroidDfuCoordinator()
     private lateinit var context: Context
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -55,55 +54,23 @@ class ExpoNordicDfuModule : Module() {
             // restoreBond: Boolean?,
             promise: Promise ->
 
-            currentPromise = promise
-            if (controller !== null) {
-                currentPromise?.reject("dfu_in_progress", "A DFU process is already running", null)
-            } else {
-                context = requireNotNull(appContext.reactContext)
-                val starter = DfuServiceInitiator(deviceAddress).apply {
-                    setZip(fileUri.toUri())
-                    createDfuNotificationChannel(context)
-                    // The device name is not required
-                    deviceName?.let { setDeviceName(it) }
-                    // Sets whether the bond information should be preserver after flashing new application.
-                    keepBond?.let { setKeepBond(keepBond) }
-                    // The number of packets of firmware data to be received by the DFU target before sending a new Packet Receipt Notification.
-                    // Disabling PRNs increases upload speed but may cause failures on devices with slow flash memory.
-                    packetReceiptNotificationParameter?.let {
-                        if (it > 0) {
-                            setPacketsReceiptNotificationsEnabled(true)
-                            setPacketsReceiptNotificationsValue(it)
-                        } else {
-                            setPacketsReceiptNotificationsEnabled(false)
-                        }
-                    }
-                    // For DFU bootloaders from SDK 15 and 16 it may be required to add a delay before sending each
-                    // data packet. This delay gives the DFU target more time to prepare flash memory, causing less
-                    // packets being dropped and more reliable transfer. Detection of packets being lost would cause
-                    // automatic switch to PRN = 1, making the DFU very slow (but reliable).
-                    prepareDataObjectDelay?.let { setPrepareDataObjectDelay(it) }
-                    // Sets the time required by the device to reboot.
-                    // rebootTime?.let { setRebootTime(it) }
-                    // Sets whether a new bond should be created after the DFU is complete.
-                    // The old bond information will be removed before.
-                    // restoreBond?.let { setRestoreBond(it) }
-                    numberOfRetries?.let { setNumberOfRetries(it) }
-                }
-                controller = starter.start(context, DfuService::class.java)
-            }
+            context = requireNotNull(appContext.reactContext)
+            val config = AndroidDfuConfig(
+                deviceAddress = deviceAddress,
+                fileUri = fileUri,
+                deviceName = deviceName,
+                keepBond = keepBond,
+                numberOfRetries = numberOfRetries,
+                packetReceiptNotificationParameter = packetReceiptNotificationParameter,
+                prepareDataObjectDelay = prepareDataObjectDelay
+            )
+            val promiseSink = ExpoPromiseSink(promise)
+            val starter = NordicAndroidDfuStarter(context)
+            coordinator.start(config, starter, promiseSink)
         }
 
         AsyncFunction("abortAndroidDfu") { promise: Promise ->
-            controller?.let {
-                it.abort()
-                if (it.isAborted) {
-                    promise.resolve()
-                } else {
-                    promise.reject("dfu_abort_failed", "Unable to abort DFU process", null)
-                }
-            } ?: run {
-                promise.reject("no_running_dfu", "There is no DFU process currently running", null)
-            }
+            coordinator.abort(ExpoPromiseSink(promise))
         }
     }
 
@@ -133,13 +100,13 @@ class ExpoNordicDfuModule : Module() {
         ) {
             sendEvent(
                 "DFUProgress",
-                mapOf(
-                    "deviceAddress" to deviceAddress,
-                    "percent" to percent,
-                    "speed" to speed,
-                    "avgSpeed" to avgSpeed,
-                    "currentPart" to currentPart,
-                    "totalParts" to partsTotal
+                DfuEventPayloads.progressPayload(
+                    deviceAddress = deviceAddress,
+                    percent = percent,
+                    speed = speed,
+                    avgSpeed = avgSpeed,
+                    currentPart = currentPart,
+                    totalParts = partsTotal
                 )
             )
         }
@@ -155,14 +122,14 @@ class ExpoNordicDfuModule : Module() {
 
         override fun onDfuCompleted(deviceAddress: String) {
             emitState("DFU_COMPLETED", deviceAddress)
-            currentPromise?.resolve(mapOf("deviceAddress" to deviceAddress))
-            resetState()
+            coordinator.onCompleted(deviceAddress)
+            cleanUpNotifications()
         }
 
         override fun onDfuAborted(deviceAddress: String) {
             emitState("DFU_ABORTED", deviceAddress)
-            currentPromise?.resolve("DFU was aborted")
-            resetState()
+            coordinator.onAborted()
+            cleanUpNotifications()
 
         }
 
@@ -173,16 +140,9 @@ class ExpoNordicDfuModule : Module() {
                 message: String
         ) {
             emitState("DFU_FAILED", deviceAddress)
-            val combinedMessage = "Error: $error, Error Type: $errorType, Message: $message"
-            currentPromise?.reject(error.toString(), combinedMessage, null)
-            resetState()
+            coordinator.onError(error, errorType, message)
+            cleanUpNotifications()
         }
-    }
-
-    private fun resetState() {
-        currentPromise = null
-        controller = null
-        cleanUpNotifications()
     }
 
     private fun cleanUpNotifications() {
@@ -195,6 +155,47 @@ class ExpoNordicDfuModule : Module() {
 
     private fun emitState(state: String, deviceAddress: String) {
         Log.d("NordicDfu", "State: $state")
-        sendEvent("DFUStateChanged", mapOf("state" to state, "deviceAddress" to deviceAddress))
+        sendEvent("DFUStateChanged", DfuEventPayloads.statePayload(state, deviceAddress))
     }
+}
+
+private class ExpoPromiseSink(private val promise: Promise) : PromiseSink {
+    override fun resolve(value: Any?) {
+        promise.resolve(value)
+    }
+
+    override fun reject(code: String, message: String, throwable: Throwable?) {
+        promise.reject(code, message, throwable)
+    }
+}
+
+private class NordicAndroidDfuStarter(private val context: Context) : AndroidDfuStarter {
+    override fun start(config: AndroidDfuConfig): DfuController {
+        val starter = DfuServiceInitiator(config.deviceAddress).apply {
+            setZip(config.fileUri.toUri())
+            createDfuNotificationChannel(context)
+            config.deviceName?.let { setDeviceName(it) }
+            config.keepBond?.let { setKeepBond(it) }
+            config.packetReceiptNotificationParameter?.let {
+                if (it > 0) {
+                    setPacketsReceiptNotificationsEnabled(true)
+                    setPacketsReceiptNotificationsValue(it)
+                } else {
+                    setPacketsReceiptNotificationsEnabled(false)
+                }
+            }
+            config.prepareDataObjectDelay?.let { setPrepareDataObjectDelay(it) }
+            config.numberOfRetries?.let { setNumberOfRetries(it) }
+        }
+        return NordicDfuController(starter.start(context, DfuService::class.java))
+    }
+}
+
+private class NordicDfuController(private val controller: DfuServiceController) : DfuController {
+    override fun abort() {
+        controller.abort()
+    }
+
+    override val isAborted: Boolean
+        get() = controller.isAborted
 }

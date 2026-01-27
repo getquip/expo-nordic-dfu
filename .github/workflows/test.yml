@@ -31,3 +31,34 @@ jobs:
           else
             echo "✅No files emitted"
           fi
+
+  native-android:
+    name: Native Tests (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - run: npm install
+      - run: npm run test:android
+
+  native-ios:
+    name: Native Tests (iOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm run test:ios

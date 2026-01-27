@@ -31,6 +31,7 @@ project.xcworkspace
 .classpath
 .cxx
 .gradle
+**/.gradle
 .idea
 .project
 .settings
@@ -52,6 +53,12 @@ node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+
+# SwiftPM
+.build
+**/.build
+.swiftpm
+**/.swiftpm
 
 # Expo
 .expo/*

@@ -117,6 +117,28 @@ npx expo run:android --device
 npx expo run:ios --device
 ```
 
+## Native unit tests (no example app)
+
+### Android
+
+Uses a lightweight Gradle harness in `android/standalone` to run JVM unit tests for native helpers.
+
+```bash
+npm run test:android
+```
+
+### iOS
+
+Uses a small SwiftPM test target that compiles only the native helper file in `ios/Shared`.
+
+```bash
+npm run test:ios
+```
+
+### CI
+
+GitHub Actions runs the native unit tests on pull requests using `npm run test:android` (Linux) and `npm run test:ios` (macOS).
+
 ## Contributing
 
 Before we can accept a pull request from you, you'll need to read and agree to our [Contributor License Agreement (CLA)](https://github.com/getquip/expo-nordic-dfu/blob/main/CONTRIBUTING.md).

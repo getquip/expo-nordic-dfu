@@ -70,7 +70,10 @@
     "prettier:fix": "prettier --config .prettierrc --write '**/*.{ts,tsx,js,jsx}'",
     "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
-    "test": "expo-module test"
+    "test": "expo-module test",
+    "test:android": "android/standalone/gradlew -p android/standalone :native-tests:test --rerun-tasks",
+    "test:ios": "swift test --package-path ios/Shared --enable-swift-testing",
+    "test:native": "npm run test:android && npm run test:ios"
   },
   "types": "build/index.d.ts",
   "url": "https://github.com/getquip/expo-nordic-dfu",
