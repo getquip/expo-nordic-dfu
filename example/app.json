@@ -39,11 +39,6 @@
       ]
     ],
     "slug": "expo-nordic-dfu-example",
-    "splash": {
-      "backgroundColor": "#ffffff",
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain"
-    },
     "userInterfaceStyle": "light",
     "version": "1.0.0",
     "web": {
