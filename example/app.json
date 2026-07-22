@@ -5,7 +5,6 @@
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/adaptive-icon.png"
       },
-      "edgeToEdgeEnabled": true,
       "package": "expo.modules.nordicdfu.example",
       "permissions": [
         "android.permission.FOREGROUND_SERVICE",
@@ -22,7 +21,6 @@
       "supportsTablet": true
     },
     "name": "expo-nordic-dfu-example",
-    "newArchEnabled": true,
     "orientation": "portrait",
     "plugins": [
       [
