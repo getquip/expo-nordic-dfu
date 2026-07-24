@@ -13,8 +13,8 @@ latest release.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 3.x     | :white_check_mark: |
-| < 3.0   | :x:                |
+| latest major   | :white_check_mark: |
+| < latest major | :x:                |
 
 ## Reporting a Vulnerability
 
