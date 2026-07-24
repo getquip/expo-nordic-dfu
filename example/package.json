@@ -1,6 +1,6 @@
 {
   "name": "expo-nordic-dfu-example",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -9,11 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "^56.0.16",
-    "expo-document-picker": "~56.0.4",
-    "expo-file-system": "~56.0.8",
+    "expo": "^57.0.8",
+    "expo-document-picker": "~57.0.1",
+    "expo-file-system": "~57.0.1",
     "react": "19.2.3",
-    "react-native": "0.85.3",
+    "react-native": "0.86.0",
     "react-native-ble-manager": "^12.1.4",
     "react-native-paper": "^5.13.3",
     "react-native-safe-area-context": "~5.7.0"
@@ -34,7 +34,7 @@
     }
   },
   "overrides": {
-    "expo-font": "56.0.7"
+    "expo-font": "57.0.1"
   },
   "private": true
 }
