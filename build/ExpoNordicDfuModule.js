@@ -1,4 +1,4 @@
-import { requireNativeModule } from 'expo';
+import { NativeModule, requireNativeModule } from 'expo';
 import { Platform } from 'react-native';
 const DfuModule = requireNativeModule('ExpoNordicDfuModule');
 class CrossplatformWrapper {

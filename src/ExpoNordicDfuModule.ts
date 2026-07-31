@@ -1,5 +1,5 @@
 import { NativeModule, requireNativeModule } from 'expo'
-import { ExpoSettingsModuleEvents, StartDFUParams } from './ExpoNordicDfu.types'
+import type { ExpoSettingsModuleEvents, StartDFUParams } from './ExpoNordicDfu.types'
 import { Platform } from 'react-native'
 
 declare class ExpoNordicDfuModule extends NativeModule<ExpoSettingsModuleEvents> {
