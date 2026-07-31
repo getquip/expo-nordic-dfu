@@ -10,10 +10,11 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-jest": "^29.2.1",
     "eslint-plugin-prettier": "^5.5.4",
-    "expo": "~56.0.16",
+    "expo": "~57.0.8",
     "expo-module-scripts": "^56.0.3",
     "prettier": "^3.7.4",
-    "react-native": "0.85.3"
+    "react-native": "0.86.0",
+    "typescript": "~5.9.3"
   },
   "engines": {
     "node": ">=20.19",
@@ -39,7 +40,7 @@
   "main": "build/index.js",
   "name": "@getquip/expo-nordic-dfu",
   "peerDependencies": {
-    "expo": "^56",
+    "expo": "^57",
     "react": "*",
     "react-native": "*"
   },
@@ -74,5 +75,5 @@
   },
   "types": "build/index.d.ts",
   "url": "https://github.com/getquip/expo-nordic-dfu",
-  "version": "5.0.0"
+  "version": "6.0.0"
 }
