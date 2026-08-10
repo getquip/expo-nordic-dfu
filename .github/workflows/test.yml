@@ -17,9 +17,9 @@ jobs:
           ref: ${{ inputs.sha }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
-      - run: npm install
+      - run: npm ci
       - name: Type Check (Compile) TypeScript
         run: |
           set -e
