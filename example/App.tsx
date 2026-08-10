@@ -18,6 +18,10 @@ const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',')
   .map((uuid: string) => uuid.trim())
   .filter((uuid: string) => uuid.length > 0)
 const ANDROID_BONDING_ENABLED = process.env.EXPO_PUBLIC_ANDROID_BONDING_ENABLED === 'true'
+// States that mean the DFU is over. Both platforms send all three. Android also
+// sends DEVICE_DISCONNECTED, but that arrives just before DFU_COMPLETED, and iOS
+// never sends it at all, so it is not a reliable finish signal.
+const DFU_TERMINAL_STATES = ['DFU_COMPLETED', 'DFU_FAILED', 'DFU_ABORTED']
 const SELECTION_COLORS = {
   none: '#ffffff',
   disabled: '#e0e0e0',
@@ -65,7 +69,7 @@ type ProgressType = {
 export default function App() {
   const [peripherals, setPeripherals] = useState<Peripheral[]>([])
   const [peripheral, setPeripheral] = useState<Peripheral>()
-  const [firmwareFile, setFirmwareFile] = useState<FirmwareFileType | false>()
+  const [firmwareFile, setFirmwareFile] = useState<FirmwareFileType>()
   const [selectedColor, setSelectedColor] = useState<string>(SELECTION_COLORS.none)
   const [firmwareProgress, setFirmwareProgress] = useState<ProgressType | undefined>(undefined)
   const [isScanning, setIsScanning] = useState<boolean | undefined>(undefined)
@@ -147,7 +151,9 @@ export default function App() {
       })
   }, [])
 
-  const firmwareDisableButtons = firmwareProgress !== undefined && firmwareProgress.state !== 'DEVICE_DISCONNECTED' && firmwareProgress.state !== 'DFU_FAILED' && firmwareProgress.state !== 'DFU_COMPLETED' && firmwareProgress.state !== 'DFU_ABORTED'
+  // A DFU is running, so the other buttons stay disabled.
+  const firmwareDisableButtons =
+    firmwareProgress !== undefined && !DFU_TERMINAL_STATES.includes(firmwareProgress.state ?? '')
 
   const backgroundColor = (selected: Peripheral) => {
     const isSelected = selected.id === peripheral?.id
