@@ -13,8 +13,8 @@ This project does not provide an interface for scanning/connecting devices via B
 - Nordic zip firmware file
 - Android 14+
 - iOS 17+
-- Expo SDK 54
-- React Native Bridgeless (new architecture) enabled (this is enabled by default in Expo 54+)
+- Expo SDK 55
+- React Native Bridgeless (new architecture) enabled (this is mandatory as of Expo 55)
 
 ## Setup
 
