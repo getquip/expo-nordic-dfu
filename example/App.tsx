@@ -77,6 +77,25 @@ export default function App() {
     };
   }, [])
 
+  // Keep these for the whole component life. Removing them when startDfu()
+  // resolves drops the final DFU_COMPLETED event.
+  useEffect(() => {
+    const progressListener = ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
+      console.info('DFUProgress:', progress)
+      setFirmwareProgress({ progress, state: 'Updating...' })
+    })
+    const stateListener = ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
+      console.info('DFUStateChanged:', state)
+      // Updater form, so we don't read stale state.
+      setFirmwareProgress((previous) => ({ state, progress: previous?.progress }))
+    })
+
+    return () => {
+      progressListener.remove()
+      stateListener.remove()
+    }
+  }, [])
+
   useEffect(() => {
     if(peripheral && selectedColor === SELECTION_COLORS.connecting) {
       void connect()
@@ -218,14 +237,6 @@ export default function App() {
 
   const startDFU = async (peripheral: Peripheral, firmwareFile: FirmwareFileType) => {
     try {
-      ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
-        console.info('DFUProgress:', progress)
-        setFirmwareProgress({ progress, state: 'Updating...' })
-      })
-      ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
-        console.info('DFUStateChanged:', state)
-        setFirmwareProgress({ state, progress: firmwareProgress?.progress })
-      })
       await ExpoNordicDfu.startDfu({
         deviceAddress: peripheral.id,
         fileUri: firmwareFile.uri,
@@ -238,21 +249,14 @@ export default function App() {
       })
     } catch (error) {
       console.error(error)
-    } finally {
-      ExpoNordicDfu.module.removeAllListeners('DFUProgress')
-      ExpoNordicDfu.module.removeAllListeners('DFUStateChanged')
     }
   }
 
   const abortDFU = async () => {
     try {
       await ExpoNordicDfu.abortDfu()
-      setFirmwareProgress({ state: 'DFU_ABORTED', progress: firmwareProgress?.progress })
     } catch (error) {
       console.error(error)
-    } finally {
-      ExpoNordicDfu.module.removeAllListeners('DFUProgress')
-      ExpoNordicDfu.module.removeAllListeners('DFUStateChanged')
     }
   }
 
