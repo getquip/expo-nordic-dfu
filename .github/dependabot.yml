@@ -1,0 +1,54 @@
+version: 2
+updates:
+  # Keeps the workflow action versions current. Without this they only move when
+  # someone notices, which is how they ended up several majors behind.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: chore
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+    # Expo package majors track the SDK version, so a major bump here is an SDK
+    # upgrade. Those should be done deliberately, not by a bot.
+    ignore:
+      - dependency-name: expo
+        update-types: ["version-update:semver-major"]
+      - dependency-name: expo-*
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint-config-expo
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react-native
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: npm
+    directory: /example
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: chore
+    groups:
+      example-dependencies:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: expo
+        update-types: ["version-update:semver-major"]
+      - dependency-name: expo-*
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react-native
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # 12.4.0 refactored scan(); moving off 12.2.x needs a hardware check.
+      - dependency-name: react-native-ble-manager

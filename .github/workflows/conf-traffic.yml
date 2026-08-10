@@ -9,8 +9,8 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/create-github-app-token@v2
+      - uses: actions/checkout@v7
+      - uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ secrets.REPO_ADMIN_READ_APP_ID }}
@@ -39,6 +39,8 @@ jobs:
             echo "VISITORS=${visitors}"
           } >> "$GITHUB_ENV"
       - name: Send Slack notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_ENG_WEBHOOK_URL }}
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           payload=$(jq -n \
@@ -99,6 +101,6 @@ jobs:
               ]
             }')
 
-          curl -X POST -H 'Content-type: application/json' \
+          curl -fsS -X POST -H 'Content-type: application/json' \
             --data "$payload" \
-            ${{ secrets.SLACK_ALERTS_ENG_WEBHOOK_URL }}
+            "$SLACK_WEBHOOK_URL"
