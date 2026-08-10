@@ -7,8 +7,7 @@ import { Text, Button } from 'react-native-paper'
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 
-// Set this in example/.env — see .env.example. Fail early with a clear message,
-// otherwise a missing value crashes on startup with an unhelpful type error.
+// Set this in example/.env — see .env.example.
 if (!process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS) {
   throw new Error(
     'EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS is not set. Copy example/.env.example to example/.env and fill it in.'
@@ -18,9 +17,7 @@ const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',')
   .map((uuid: string) => uuid.trim())
   .filter((uuid: string) => uuid.length > 0)
 const ANDROID_BONDING_ENABLED = process.env.EXPO_PUBLIC_ANDROID_BONDING_ENABLED === 'true'
-// States that mean the DFU is over. Both platforms send all three. Android also
-// sends DEVICE_DISCONNECTED, but that arrives just before DFU_COMPLETED, and iOS
-// never sends it at all, so it is not a reliable finish signal.
+// States that mean the DFU is over. Both platforms send all three.
 const DFU_TERMINAL_STATES = ['DFU_COMPLETED', 'DFU_FAILED', 'DFU_ABORTED']
 const SELECTION_COLORS = {
   none: '#ffffff',
@@ -30,8 +27,6 @@ const SELECTION_COLORS = {
   error: '#ff0000',
 }
 
-// Cache the promise, not a boolean, so two callers at once share one start().
-// React runs effects twice in development, so this does happen.
 let bleInitialization: Promise<boolean> | undefined
 const bleManagerInitialize = async () => {
   if (!bleInitialization) {
@@ -91,8 +86,6 @@ export default function App() {
     };
   }, [])
 
-  // Keep these for the whole component life. Removing them when startDfu()
-  // resolves drops the final DFU_COMPLETED event.
   useEffect(() => {
     const progressListener = ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
       console.info('DFUProgress:', progress)
@@ -116,8 +109,7 @@ export default function App() {
     }
   }, [selectedColor, peripheral])
 
-  // Ask for Bluetooth permissions once, on mount. Doing this in the component
-  // body instead would re-run the request on every render.
+  // Ask for Bluetooth permissions once, on mount.
   useEffect(() => {
     if (Platform.OS !== 'android') {
       return
@@ -129,8 +121,7 @@ export default function App() {
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
     ])
       .then((result) => {
-        // requestMultiple resolves to { [permission]: 'granted' | 'denied' | ... },
-        // so the object is always truthy. Check each status instead.
+        // requestMultiple resolves to { [permission]: 'granted' | 'denied' | ... }, so the object is always truthy.
         const denied = Object.entries(result)
           .filter(([, status]) => status !== PermissionsAndroid.RESULTS.GRANTED)
           .map(([permission]) => permission)
@@ -189,8 +180,6 @@ export default function App() {
       await BleManager.scan(SERVICE_UUIDS, 5, false)
       setIsScanning(true)
     } catch (error) {
-      // Handle it here. Throwing from an onPress handler just becomes an
-      // unhandled rejection and the user sees nothing.
       console.error('Scan failed', error)
       setIsScanning(false)
       await BleManager.stopScan().catch(() => undefined)
@@ -229,8 +218,6 @@ export default function App() {
       setSelectedColor(SELECTION_COLORS.connected)
       console.debug(`${peripheral.id}] Connected to ${peripheral.name}`)
     } catch (error) {
-      // Already reported to the user via the error colour. Re-throwing would
-      // only produce an unhandled rejection in the effect that calls this.
       console.error('Connection error', error)
       setSelectedColor(SELECTION_COLORS.error)
       setPeripheral(undefined)

@@ -75,17 +75,9 @@ ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
 })
 ```
 
-#### Keep your listeners past the end of the DFU
-
 **Do not remove the listeners as soon as `startDfu()` resolves.** That promise
 settles in the same native callback that sends the final `DFU_COMPLETED` event,
 so removing them at that moment can drop it.
-
-Add them before you start a DFU and keep them for as long as you care about DFU
-events. In React, a `useEffect` with an empty dependency array works well — see
-[example/App.tsx](example/App.tsx).
-
-#### Knowing when a DFU is over
 
 `DFUStateChanged` ends with `DFU_COMPLETED`, `DFU_FAILED` or `DFU_ABORTED`. Both
 platforms send all three, so check for those.
