@@ -7,7 +7,16 @@ import { Text, Button } from 'react-native-paper'
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 
-const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',').map((uuid: string) => uuid.trim())
+// Set this in example/.env — see .env.example. Fail early with a clear message,
+// otherwise a missing value crashes on startup with an unhelpful type error.
+if (!process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS) {
+  throw new Error(
+    'EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS is not set. Copy example/.env.example to example/.env and fill it in.'
+  )
+}
+const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',')
+  .map((uuid: string) => uuid.trim())
+  .filter((uuid: string) => uuid.length > 0)
 const ANDROID_BONDING_ENABLED = process.env.EXPO_PUBLIC_ANDROID_BONDING_ENABLED === 'true'
 const SELECTION_COLORS = {
   none: '#ffffff',
@@ -17,25 +26,26 @@ const SELECTION_COLORS = {
   error: '#ff0000',
 }
 
-let bleInitialized = false
+// Cache the promise, not a boolean, so two callers at once share one start().
+// React runs effects twice in development, so this does happen.
+let bleInitialization: Promise<boolean> | undefined
 const bleManagerInitialize = async () => {
-  if (bleInitialized) {
-    return true
+  if (!bleInitialization) {
+    bleInitialization = (async () => {
+      try {
+        await BleManager.start({ showAlert: true })
+        console.info('BleManager started')
+        return true
+      } catch (error) {
+        console.error('Unexpected error starting BleManager', error)
+        // Clear it so a later call can try again.
+        bleInitialization = undefined
+        return false
+      }
+    })()
   }
 
-  const initializing = (async () => {
-    try {
-      await BleManager.start({ showAlert: true })
-      bleInitialized = true
-      console.info('BleManager started')
-      return true
-    } catch (error) {
-      console.error('Unexpected error starting BleManager', error)
-      return false
-    }
-  })()
-
-  return await initializing
+  return await bleInitialization
 }
 
 function sleep(ms: number) {
