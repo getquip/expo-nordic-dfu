@@ -5,7 +5,6 @@
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/adaptive-icon.png"
       },
-      "edgeToEdgeEnabled": true,
       "package": "expo.modules.nordicdfu.example",
       "permissions": [
         "android.permission.FOREGROUND_SERVICE",
@@ -22,13 +21,20 @@
       "supportsTablet": true
     },
     "name": "expo-nordic-dfu-example",
-    "newArchEnabled": true,
     "orientation": "portrait",
     "plugins": [
       [
         "expo-document-picker",
         {
           "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain"
         }
       ],
       [
@@ -41,11 +47,6 @@
       ]
     ],
     "slug": "expo-nordic-dfu-example",
-    "splash": {
-      "backgroundColor": "#ffffff",
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain"
-    },
     "userInterfaceStyle": "light",
     "version": "1.0.0",
     "web": {
