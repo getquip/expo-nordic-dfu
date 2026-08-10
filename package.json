@@ -25,6 +25,13 @@
       "android"
     ]
   },
+  "files": [
+    "android/build.gradle",
+    "android/src/main",
+    "build",
+    "expo-module.config.json",
+    "ios"
+  ],
   "homepage": "https://github.com/getquip/expo-nordic-dfu#readme",
   "keywords": [
     "android",
@@ -45,14 +52,6 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "react-native": {
-    "codegenConfig": {
-      "jsSrcsDir": "src",
-      "libraryName": "ExpoNordicDfu",
-      "name": "ExpoNordicDfu",
-      "type": "modules"
-    }
   },
   "repository": {
     "type": "git",

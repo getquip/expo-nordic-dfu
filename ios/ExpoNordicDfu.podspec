@@ -12,7 +12,9 @@ Pod::Spec.new do |s|
   s.homepage     = package["homepage"] || package["url"]
   s.platform     = :ios, "15.1"
   s.swift_version  = '5.4'
-  s.source       = { :git => "#{package["repository"]["url"]}.git", :tag => s.version }
+  # repository.url is already a .git URL prefixed with "git+", so it only needs
+  # the prefix stripped. Appending ".git" produced a "...git.git" URL.
+  s.source       = { :git => package["repository"]["url"].sub(/\Agit\+/, ""), :tag => s.version }
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
