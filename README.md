@@ -63,7 +63,7 @@ Please see the [example app](example)!
 The listeners work mostly the same as the original @ [Pilloxa/react-native-nordic-dfu](https://github.com/Pilloxa/react-native-nordic-dfu)
 
 - `DFUProgress`: Reports back progress and extra values like upload speed
-- `DFUStateChanged`: Reports back when major DFU flow miletones happen. It will also tell you if the DFU finished, failed or was aborted
+- `DFUStateChanged`: Reports back when major DFU flow milestones happen. It will also tell you if the DFU finished, failed or was aborted
 
 ```typescript
 // See the type file src/ExpoNordicDfu.types.ts for schema
@@ -74,6 +74,16 @@ ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
   console.info('DFUStateChanged:', state)
 })
 ```
+
+**Do not remove the listeners as soon as `startDfu()` resolves.** That promise
+settles in the same native callback that sends the final `DFU_COMPLETED` event,
+so removing them at that moment can drop it.
+
+`DFUStateChanged` ends with `DFU_COMPLETED`, `DFU_FAILED` or `DFU_ABORTED`. Both
+platforms send all three, so check for those.
+
+Android also sends `DEVICE_DISCONNECTED`, but it arrives just before
+`DFU_COMPLETED`, and iOS never sends it. Don't use it to detect the end of a DFU.
 
 ### DFU
 

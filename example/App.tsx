@@ -7,8 +7,18 @@ import { Text, Button } from 'react-native-paper'
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 
-const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',').map((uuid: string) => uuid.trim())
+// Set this in example/.env — see .env.example.
+if (!process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS) {
+  throw new Error(
+    'EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS is not set. Copy example/.env.example to example/.env and fill it in.'
+  )
+}
+const SERVICE_UUIDS = process.env.EXPO_PUBLIC_BLUETOOTH_SERVICE_UUIDS.split(',')
+  .map((uuid: string) => uuid.trim())
+  .filter((uuid: string) => uuid.length > 0)
 const ANDROID_BONDING_ENABLED = process.env.EXPO_PUBLIC_ANDROID_BONDING_ENABLED === 'true'
+// States that mean the DFU is over. Both platforms send all three.
+const DFU_TERMINAL_STATES = ['DFU_COMPLETED', 'DFU_FAILED', 'DFU_ABORTED']
 const SELECTION_COLORS = {
   none: '#ffffff',
   disabled: '#e0e0e0',
@@ -17,25 +27,24 @@ const SELECTION_COLORS = {
   error: '#ff0000',
 }
 
-let bleInitialized = false
+let bleInitialization: Promise<boolean> | undefined
 const bleManagerInitialize = async () => {
-  if (bleInitialized) {
-    return true
+  if (!bleInitialization) {
+    bleInitialization = (async () => {
+      try {
+        await BleManager.start({ showAlert: true })
+        console.info('BleManager started')
+        return true
+      } catch (error) {
+        console.error('Unexpected error starting BleManager', error)
+        // Clear it so a later call can try again.
+        bleInitialization = undefined
+        return false
+      }
+    })()
   }
 
-  const initializing = (async () => {
-    try {
-      await BleManager.start({ showAlert: true })
-      bleInitialized = true
-      console.info('BleManager started')
-      return true
-    } catch (error) {
-      console.error('Unexpected error starting BleManager', error)
-      return false
-    }
-  })()
-
-  return await initializing
+  return await bleInitialization
 }
 
 function sleep(ms: number) {
@@ -55,7 +64,7 @@ type ProgressType = {
 export default function App() {
   const [peripherals, setPeripherals] = useState<Peripheral[]>([])
   const [peripheral, setPeripheral] = useState<Peripheral>()
-  const [firmwareFile, setFirmwareFile] = useState<FirmwareFileType | false>()
+  const [firmwareFile, setFirmwareFile] = useState<FirmwareFileType>()
   const [selectedColor, setSelectedColor] = useState<string>(SELECTION_COLORS.none)
   const [firmwareProgress, setFirmwareProgress] = useState<ProgressType | undefined>(undefined)
   const [isScanning, setIsScanning] = useState<boolean | undefined>(undefined)
@@ -78,30 +87,64 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const progressListener = ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
+      console.info('DFUProgress:', progress)
+      setFirmwareProgress({ progress, state: 'Updating...' })
+    })
+    const stateListener = ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
+      console.info('DFUStateChanged:', state)
+      // Updater form, so we don't read stale state.
+      setFirmwareProgress((previous) => ({ state, progress: previous?.progress }))
+    })
+
+    return () => {
+      progressListener.remove()
+      stateListener.remove()
+    }
+  }, [])
+
+  useEffect(() => {
     if(peripheral && selectedColor === SELECTION_COLORS.connecting) {
       void connect()
     }
   }, [selectedColor, peripheral])
 
-  if (Platform.OS === 'android') {
+  // Ask for Bluetooth permissions once, on mount.
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return
+    }
+
     PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
-    ]).then((result) => {
-      if (result) {
-        console.debug('User accepts Bluetooth permissions')
-      } else {
-        console.error('User refuses Bluetooth permissions')
+    ])
+      .then((result) => {
+        // requestMultiple resolves to { [permission]: 'granted' | 'denied' | ... }, so the object is always truthy.
+        const denied = Object.entries(result)
+          .filter(([, status]) => status !== PermissionsAndroid.RESULTS.GRANTED)
+          .map(([permission]) => permission)
+
+        if (denied.length === 0) {
+          console.debug('User accepts Bluetooth permissions')
+          return
+        }
+
+        console.error('User refuses Bluetooth permissions', denied)
         Alert.alert(
           'Accept Permissions',
           'You have to accept Bluetooth permissions to use this app',
-        );
-      }
-    })
-  }
+        )
+      })
+      .catch((error) => {
+        console.error('Bluetooth permission request failed', error)
+      })
+  }, [])
 
-  const firmwareDisableButtons = firmwareProgress !== undefined && firmwareProgress.state !== 'DEVICE_DISCONNECTED' && firmwareProgress.state !== 'DFU_FAILED' && firmwareProgress.state !== 'DFU_COMPLETED' && firmwareProgress.state !== 'DFU_ABORTED'
+  // A DFU is running, so the other buttons stay disabled.
+  const firmwareDisableButtons =
+    firmwareProgress !== undefined && !DFU_TERMINAL_STATES.includes(firmwareProgress.state ?? '')
 
   const backgroundColor = (selected: Peripheral) => {
     const isSelected = selected.id === peripheral?.id
@@ -117,7 +160,12 @@ export default function App() {
 
   const reset = async (peripheral: Peripheral | undefined) => {
     if (peripheral) {
-      await BleManager.disconnect(peripheral.id)
+      try {
+        await BleManager.disconnect(peripheral.id)
+      } catch (error) {
+        // The device may already be gone. Clear our own state either way.
+        console.warn('Failed to disconnect', error)
+      }
     }
     setPeripherals([])
     setPeripheral(undefined)
@@ -132,8 +180,10 @@ export default function App() {
       await BleManager.scan(SERVICE_UUIDS, 5, false)
       setIsScanning(true)
     } catch (error) {
-      await BleManager.stopScan()
-      throw error
+      console.error('Scan failed', error)
+      setIsScanning(false)
+      await BleManager.stopScan().catch(() => undefined)
+      Alert.alert('Scan Failed', 'Could not start scanning for devices')
     }
   }
 
@@ -171,7 +221,6 @@ export default function App() {
       console.error('Connection error', error)
       setSelectedColor(SELECTION_COLORS.error)
       setPeripheral(undefined)
-      throw error
     }
   }
 
@@ -218,14 +267,6 @@ export default function App() {
 
   const startDFU = async (peripheral: Peripheral, firmwareFile: FirmwareFileType) => {
     try {
-      ExpoNordicDfu.module.addListener('DFUProgress', (progress) => {
-        console.info('DFUProgress:', progress)
-        setFirmwareProgress({ progress, state: 'Updating...' })
-      })
-      ExpoNordicDfu.module.addListener('DFUStateChanged', ({ state }) => {
-        console.info('DFUStateChanged:', state)
-        setFirmwareProgress({ state, progress: firmwareProgress?.progress })
-      })
       await ExpoNordicDfu.startDfu({
         deviceAddress: peripheral.id,
         fileUri: firmwareFile.uri,
@@ -238,21 +279,14 @@ export default function App() {
       })
     } catch (error) {
       console.error(error)
-    } finally {
-      ExpoNordicDfu.module.removeAllListeners('DFUProgress')
-      ExpoNordicDfu.module.removeAllListeners('DFUStateChanged')
     }
   }
 
   const abortDFU = async () => {
     try {
       await ExpoNordicDfu.abortDfu()
-      setFirmwareProgress({ state: 'DFU_ABORTED', progress: firmwareProgress?.progress })
     } catch (error) {
       console.error(error)
-    } finally {
-      ExpoNordicDfu.module.removeAllListeners('DFUProgress')
-      ExpoNordicDfu.module.removeAllListeners('DFUStateChanged')
     }
   }
 
@@ -326,7 +360,7 @@ export default function App() {
                 disabled={firmwareDisableButtons}
                 mode="contained-tonal"
                 onPress={() => {
-                  reset(peripheral)
+                  void reset(peripheral)
                 }}
               >
                 Disconnect
