@@ -102,23 +102,40 @@ export default function App() {
     }
   }, [selectedColor, peripheral])
 
-  if (Platform.OS === 'android') {
+  // Ask for Bluetooth permissions once, on mount. Doing this in the component
+  // body instead would re-run the request on every render.
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return
+    }
+
     PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
-    ]).then((result) => {
-      if (result) {
-        console.debug('User accepts Bluetooth permissions')
-      } else {
-        console.error('User refuses Bluetooth permissions')
+    ])
+      .then((result) => {
+        // requestMultiple resolves to { [permission]: 'granted' | 'denied' | ... },
+        // so the object is always truthy. Check each status instead.
+        const denied = Object.entries(result)
+          .filter(([, status]) => status !== PermissionsAndroid.RESULTS.GRANTED)
+          .map(([permission]) => permission)
+
+        if (denied.length === 0) {
+          console.debug('User accepts Bluetooth permissions')
+          return
+        }
+
+        console.error('User refuses Bluetooth permissions', denied)
         Alert.alert(
           'Accept Permissions',
           'You have to accept Bluetooth permissions to use this app',
-        );
-      }
-    })
-  }
+        )
+      })
+      .catch((error) => {
+        console.error('Bluetooth permission request failed', error)
+      })
+  }, [])
 
   const firmwareDisableButtons = firmwareProgress !== undefined && firmwareProgress.state !== 'DEVICE_DISCONNECTED' && firmwareProgress.state !== 'DFU_FAILED' && firmwareProgress.state !== 'DFU_COMPLETED' && firmwareProgress.state !== 'DFU_ABORTED'
 
