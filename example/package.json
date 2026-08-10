@@ -16,14 +16,14 @@
     "expo-system-ui": "~55.0.20",
     "react": "19.2.0",
     "react-native": "0.83.10",
-    "react-native-ble-manager": "^12.1.4",
-    "react-native-paper": "^5.13.3",
-    "react-native-safe-area-context": "^5.6.2"
+    "react-native-ble-manager": "~12.2.2",
+    "react-native-paper": "^5.15.3",
+    "react-native-safe-area-context": "~5.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
-    "@types/react": "~19.2.10",
-    "expo-doctor": "^1.17.12",
+    "@types/react": "~19.2.18",
+    "expo-doctor": "^1.20.1",
     "typescript": "~5.9.2"
   },
   "engines": {
