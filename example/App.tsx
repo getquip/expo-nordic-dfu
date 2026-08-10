@@ -153,7 +153,12 @@ export default function App() {
 
   const reset = async (peripheral: Peripheral | undefined) => {
     if (peripheral) {
-      await BleManager.disconnect(peripheral.id)
+      try {
+        await BleManager.disconnect(peripheral.id)
+      } catch (error) {
+        // The device may already be gone. Clear our own state either way.
+        console.warn('Failed to disconnect', error)
+      }
     }
     setPeripherals([])
     setPeripheral(undefined)
@@ -168,8 +173,12 @@ export default function App() {
       await BleManager.scan(SERVICE_UUIDS, 5, false)
       setIsScanning(true)
     } catch (error) {
-      await BleManager.stopScan()
-      throw error
+      // Handle it here. Throwing from an onPress handler just becomes an
+      // unhandled rejection and the user sees nothing.
+      console.error('Scan failed', error)
+      setIsScanning(false)
+      await BleManager.stopScan().catch(() => undefined)
+      Alert.alert('Scan Failed', 'Could not start scanning for devices')
     }
   }
 
@@ -204,10 +213,11 @@ export default function App() {
       setSelectedColor(SELECTION_COLORS.connected)
       console.debug(`${peripheral.id}] Connected to ${peripheral.name}`)
     } catch (error) {
+      // Already reported to the user via the error colour. Re-throwing would
+      // only produce an unhandled rejection in the effect that calls this.
       console.error('Connection error', error)
       setSelectedColor(SELECTION_COLORS.error)
       setPeripheral(undefined)
-      throw error
     }
   }
 
@@ -347,7 +357,7 @@ export default function App() {
                 disabled={firmwareDisableButtons}
                 mode="contained-tonal"
                 onPress={() => {
-                  reset(peripheral)
+                  void reset(peripheral)
                 }}
               >
                 Disconnect
