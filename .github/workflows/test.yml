@@ -12,22 +12,39 @@ jobs:
     name: Typescript Compile
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.sha }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - name: Type Check (Compile) TypeScript
         run: |
-          set -e
+          set -euo pipefail
           npx tsc
-          git diff
-          if ! git diff --quiet; then
+          # Use git status, not git diff: a newly emitted file is untracked and
+          # git diff would not see it.
+          if [ -n "$(git status --porcelain)" ]; then
             echo "❌ Emitted files found, please compile your TypeScript code before submitting a PR"
+            git status --porcelain
+            git diff
             exit 1
-          else
-            echo "✅No files emitted"
           fi
+          echo "✅ No files emitted"
+
+  jest:
+    name: Jest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Run tests
+        run: npm test
