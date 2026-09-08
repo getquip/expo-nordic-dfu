@@ -5,21 +5,29 @@ on:
       sha:
         required: true
         type: string
-      diff_ref:
-        required: true
-        type: string
 permissions:
   contents: read
 jobs:
   actionlint:
     name: Actionlint
     runs-on: ubuntu-latest
+    env:
+      ACTIONLINT_VERSION: 1.7.12
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.sha }}
       - name: Download actionlint
         id: get_actionlint
         shell: bash
-        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+        # Download to a file rather than `bash <(curl ...)`. With process
+        # substitution a failed download is piped to bash as empty input and the
+        # step passes without linting anything.
+        run: |
+          set -euo pipefail
+          curl -fsSL -o "${RUNNER_TEMP}/download-actionlint.bash" \
+            "https://raw.githubusercontent.com/rhysd/actionlint/v${ACTIONLINT_VERSION}/scripts/download-actionlint.bash"
+          bash "${RUNNER_TEMP}/download-actionlint.bash" "${ACTIONLINT_VERSION}"
       - name: Check Workflow Files
         shell: bash
         run: ${{ steps.get_actionlint.outputs.executable }} -color -verbose
@@ -28,10 +36,10 @@ jobs:
     name: Prettier
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.sha }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -42,13 +50,11 @@ jobs:
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
-    env:
-      ESLINT_PLUGIN_DIFF_COMMIT: ${{ inputs.diff_ref }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.sha }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
