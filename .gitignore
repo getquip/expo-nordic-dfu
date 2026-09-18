@@ -8,7 +8,11 @@ jsconfig.json
 
 # Xcode
 #
-build/
+# NOTE: /build is the compiled TypeScript output. It is committed, because it is
+# this package's "main" entry point. Only the native build directories are
+# ignored, so newly emitted files in /build stay visible to git.
+/android/build/
+/ios/build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3

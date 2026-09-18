@@ -131,3 +131,5 @@ npx expo run:ios --device
 ## Contributing
 
 Before we can accept a pull request from you, you'll need to read and agree to our [Contributor License Agreement (CLA)](https://github.com/getquip/expo-nordic-dfu/blob/main/CONTRIBUTING.md).
+
+After changing anything in `src/`, run `npm run build` and commit the updated `build/` directory. It is the published entry point, and CI fails if it is out of date.

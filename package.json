@@ -25,6 +25,14 @@
       "android"
     ]
   },
+  "files": [
+    "android/build.gradle",
+    "android/src/main",
+    "build",
+    "expo-module.config.json",
+    "ios/*.podspec",
+    "ios/*.{h,m,mm,swift}"
+  ],
   "homepage": "https://github.com/getquip/expo-nordic-dfu#readme",
   "keywords": [
     "android",
@@ -46,20 +54,12 @@
   "publishConfig": {
     "access": "public"
   },
-  "react-native": {
-    "codegenConfig": {
-      "jsSrcsDir": "src",
-      "libraryName": "ExpoNordicDfu",
-      "name": "ExpoNordicDfu",
-      "type": "modules"
-    }
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/getquip/expo-nordic-dfu.git"
   },
   "scripts": {
-    "build": "expo-module build",
+    "build": "EXPO_NONINTERACTIVE=1 expo-module build",
     "clean": "expo-module clean",
     "expo-module": "expo-module",
     "eslint:check": "eslint . --config eslint.config.mjs --max-warnings 0",
@@ -68,8 +68,7 @@
     "open:ios": "xed example/ios",
     "prettier:check": "prettier --config .prettierrc --check '**/*.{ts,tsx,js,jsx}'",
     "prettier:fix": "prettier --config .prettierrc --write '**/*.{ts,tsx,js,jsx}'",
-    "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
+    "prepare": "expo-module clean && EXPO_NONINTERACTIVE=1 expo-module build",
     "test": "expo-module test --passWithNoTests"
   },
   "types": "build/index.d.ts",
