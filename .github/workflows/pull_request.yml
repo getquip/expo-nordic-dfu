@@ -12,7 +12,6 @@ jobs:
     uses: ./.github/workflows/lint.yml
     with:
       sha: ${{ github.sha }}
-      diff_ref: ${{ github.event.pull_request.base.ref }}
 
   test:
     name: Test

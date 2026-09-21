@@ -30,6 +30,14 @@
         }
       ],
       [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain"
+        }
+      ],
+      [
         "react-native-ble-manager",
         {
           "bluetoothAlwaysPermission": "to connect to to Bluetooth devices",
