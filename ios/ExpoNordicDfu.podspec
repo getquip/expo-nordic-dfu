@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.license      = package['license']
   s.author       = package['author']
   s.homepage     = package["homepage"] || package["url"]
-  s.platform     = :ios, "15.1"
+  s.platform     = :ios, "16.4"
   s.swift_version  = '5.4'
   s.source       = { :git => "#{package["repository"]["url"]}.git", :tag => s.version }
   s.static_framework = true

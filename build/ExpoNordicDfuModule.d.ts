@@ -1,5 +1,5 @@
 import { NativeModule } from 'expo';
-import { ExpoSettingsModuleEvents, StartDFUParams } from './ExpoNordicDfu.types';
+import type { ExpoSettingsModuleEvents, StartDFUParams } from './ExpoNordicDfu.types';
 declare class ExpoNordicDfuModule extends NativeModule<ExpoSettingsModuleEvents> {
     startAndroidDfu(deviceAddress: string, fileUri: string, deviceName?: string, keepBond?: boolean, numberOfRetries?: number, packetReceiptNotificationParameter?: number, prepareDataObjectDelay?: number, rebootTime?: number, restoreBond?: boolean): Promise<void>;
     abortAndroidDfu(): Promise<void>;
